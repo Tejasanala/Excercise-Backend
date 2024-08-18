@@ -10,6 +10,7 @@ const Excercises = new Entity(
     attributes: {
       ValueId: {
         type: "string",
+        required: true,
       },
       name: {
         type: "string",
