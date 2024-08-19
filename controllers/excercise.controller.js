@@ -67,11 +67,11 @@ async function createexeByIdCtr(request, response) {
 }
 
 async function UpdateexeByIdCtr(request, response) {
-  const { ValueId } = request.params;
-  //   console.log(id);
+  const { id } = request.params;
+
   const updatedData = request.body;
 
-  const existingData = await GetexeById(ValueId);
+  const existingData = await GetexeById(id);
   if (existingData.data) {
     const res = await UpdateexeById(existingData, updatedData);
     console.log(res.data);
