@@ -20,8 +20,17 @@ async function GetexeCtr(request, response) {
 
   const filterData = await Excercises.scan
     .where(
-      ({ name, type }, { contains }) => `
-      ${contains(name, search)} OR ${contains(type, search)}
+      (
+        { name, type, preferredTime, cautionAge, bodyPartAffected },
+        { contains }
+      ) => `
+      ${contains(name, search)} OR ${contains(type, search)}  OR ${contains(
+        preferredTime,
+        search
+      )} OR ${contains(cautionAge, search)} OR ${contains(
+        bodyPartAffected,
+        search
+      )}
       `
     )
     .go();
