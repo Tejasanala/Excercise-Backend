@@ -7,6 +7,7 @@ import {
   Getexe,
 } from "../service/excercise.service.js";
 import { v4 as uuidv4 } from "uuid";
+import { Session } from "../entity/session.entity.js";
 
 async function GetexeCtr(request, response) {
   //we can also write html codes in send .. it can render the file
@@ -60,8 +61,6 @@ async function DeleteexeByIdCtr(request, response) {
   //we can also write html codes in send .. it can render the file
   const { id } = request.params;
 
-  // const res = movies.filter((findd) => findd.id != id);
-  // const data = await Movies.query.primary({ movieId: `${id}` }).go();
   const data = await DeleteexeById(id);
   console.log(data.data);
   if (data) {
@@ -85,13 +84,6 @@ async function createexeByIdCtr(request, response) {
   await createexeById(datas);
 
   response.send(datas);
-
-  // response.send({ msg: "Movie added Successfully." });
-  // if (res) {
-  //   response.send(res);
-  // } else {
-  //   response.status(404).send({ msg: "Movie not found" });
-  // }
 }
 
 async function UpdateexeByIdCtr(request, response) {
@@ -99,13 +91,19 @@ async function UpdateexeByIdCtr(request, response) {
 
   const updatedData = request.body;
 
-  const existingData = await GetexeById(id);
-  if (existingData.data) {
-    const res = await UpdateexeById(existingData, updatedData);
-    console.log(res.data);
-    response.send(res.data);
-  } else {
-    response.status(404).send({ msg: "Movie not found" });
+  try {
+    const existingData = await GetexeById(id);
+
+    if (existingData.data) {
+      const res = await UpdateexeById(existingData, updatedData);
+      console.log(res.data);
+      response.send(res.data);
+    } else {
+      response.status(404).send({ msg: "Exercise not found" });
+    }
+  } catch (err) {
+    console.error(err);
+    response.status(500).send({ msg: "Failed to display" });
   }
 }
 

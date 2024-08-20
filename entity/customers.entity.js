@@ -5,15 +5,20 @@ const Customers = new Entity(
   {
     model: {
       entity: "customers",
-      version: "1",
+      version: "2",
       service: "CustomersService",
     },
     attributes: {
       username: {
         type: "string",
+        required: true,
       },
       password: {
         type: "string",
+        required: true,
+      },
+      roleId: {
+        type: "number",
       },
     },
     indexes: {

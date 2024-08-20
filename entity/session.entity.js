@@ -1,18 +1,20 @@
-import { Entity } from "electrodb"; //ORM
+import { Entity } from "electrodb"; // ORM(Object relation mapping) // Adapter on adapter
+
 import { client } from "../util/dbconnection.js";
-const admin = new Entity(
+
+const Session = new Entity(
   {
     model: {
-      entity: "admin",
-      version: "1",
-      service: "AdminService",
+      entity: "session",
+      version: "2",
+      service: "sessionService",
     },
     attributes: {
-      Adminname: {
+      username: {
         type: "string",
         required: true,
       },
-      password: {
+      token: {
         type: "string",
         required: true,
       },
@@ -20,18 +22,17 @@ const admin = new Entity(
     indexes: {
       primary: {
         pk: {
-          // highlight-next-line
           field: "pk",
-          facets: ["Adminname"],
+          facets: ["token"],
         },
         sk: {
-          // highlight-next-line
           field: "sk",
           facets: [],
         },
       },
     },
   },
-  { client, table: "admin" }
+  { client, table: "session" }
 );
-export { admin };
+
+export { Session };

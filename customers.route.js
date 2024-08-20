@@ -7,6 +7,10 @@ import {
 
 const router = express.Router();
 
+// router.post("/signup/:roleId", express.json(), createUserCtr);
+
+// router.post("/login/:roleId", express.json(), getUserCtr);
+
 router.post("/signup", express.json(), createUserCtr);
 
 router.post("/login", express.json(), getUserCtr);

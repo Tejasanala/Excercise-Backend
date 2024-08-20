@@ -1,6 +1,11 @@
-import { createUser, getUserByName } from "../service/customers.service.js";
+import {
+  createUser,
+  getUserByName,
+  createSession,
+} from "../service/customers.service.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { Session } from "../entity/session.entity.js";
 
 const genHashpassword = async (password) => {
   const NO_OF_ROUNDS = 10;
@@ -11,7 +16,8 @@ const genHashpassword = async (password) => {
 
 async function createUserCtr(request, response) {
   const data = request.body;
-
+  const password = data.password;
+  const roleId = 1;
   if (data.password.length < 8) {
     response.status(400).send({ msg: "Password is too short" });
     return;
@@ -23,32 +29,35 @@ async function createUserCtr(request, response) {
     return;
   }
 
-  const hashpassword = await genHashpassword(data.password);
-
+  const hashpassword = await genHashpassword(password);
+  const hasheddata = {
+    username: data.username,
+    password: hashpassword,
+    roleId: roleId,
+  };
   try {
-    await createUser({ username: data.username, password: hashpassword });
-
-    response.send(data);
-  } catch {
-    response.status(404).send({ msg: "msg" });
+    await createUser(hasheddata);
+    response.status(201).send(hasheddata);
+    console.log(hasheddata);
+  } catch (err) {
+    console.log(err.message);
+    response.send({ msg: "unable to create" });
   }
 }
+
 // ..........................................................
 
 async function getUserCtr(request, response) {
-  try {
-    const data = request.body;
-    console.log(data);
+  const data = request.body;
+  const username = data.username;
+  const storedDBUser = await getUserByName(data.username);
 
-    const storedDBUser = await getUserByName(data.username);
-
-    if (!storedDBUser.data) {
-      response.status(404).send({ msg: "Invalid credentials" });
-      return;
-    }
+  if (!storedDBUser.data) {
+    response.status(404).send({ msg: "Invalid credentials" });
+    return;
+  } else {
     const storedPassword = storedDBUser.data.password;
     const providedPassword = data.password;
-
     console.log(providedPassword, storedPassword);
 
     //here the order is important the stored password is given as a second parameter
@@ -56,20 +65,25 @@ async function getUserCtr(request, response) {
       providedPassword,
       storedPassword
     );
-    console.log(isPasswordCheck);
     if (isPasswordCheck) {
       var token = jwt.sign(
-        { nithin: storedDBUser.data.username },
+        { teja: storedDBUser.data.username },
         process.env.SECRET_KEY
       );
-      response.status(200).send({ msg: "Login Successful", token });
+
+      const sessionData = { username, token };
+      const roleId = storedDBUser.data.roleId;
+      const userName = storedDBUser.data.username;
+      await createSession(sessionData);
+
+      response
+        .status(200)
+        .send({ msg: "Login Successful", token, roleId, userName });
       return;
     } else {
       response.status(400).send({ msg: "Invalid credentials" });
       return;
     }
-  } catch (err) {
-    console.log(err.message);
   }
 }
 
