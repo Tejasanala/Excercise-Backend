@@ -36,36 +36,40 @@ async function createUserCtr(request, response) {
 // ..........................................................
 
 async function getUserCtr(request, response) {
-  const data = request.body;
-  console.log(data);
+  try {
+    const data = request.body;
+    console.log(data);
 
-  const storedDBUser = await getUserByName(data.username);
+    const storedDBUser = await getUserByName(data.username);
 
-  if (!storedDBUser.data) {
-    response.status(404).send({ msg: "Invalid credentials" });
-    return;
-  }
-  const storedPassword = storedDBUser.data.password;
-  const providedPassword = data.password;
+    if (!storedDBUser.data) {
+      response.status(404).send({ msg: "Invalid credentials" });
+      return;
+    }
+    const storedPassword = storedDBUser.data.password;
+    const providedPassword = data.password;
 
-  console.log(providedPassword, storedPassword);
+    console.log(providedPassword, storedPassword);
 
-  //here the order is important the stored password is given as a second parameter
-  const isPasswordCheck = await bcrypt.compare(
-    providedPassword,
-    storedPassword
-  );
-  console.log(isPasswordCheck);
-  if (isPasswordCheck) {
-    var token = jwt.sign(
-      { nithin: storedDBUser.data.username },
-      process.env.SECRET_KEY
+    //here the order is important the stored password is given as a second parameter
+    const isPasswordCheck = await bcrypt.compare(
+      providedPassword,
+      storedPassword
     );
-    response.status(200).send({ msg: "Login Successful" });
-    return;
-  } else {
-    response.status(400).send({ msg: "Invalid credentials" });
-    return;
+    console.log(isPasswordCheck);
+    if (isPasswordCheck) {
+      var token = jwt.sign(
+        { nithin: storedDBUser.data.username },
+        process.env.SECRET_KEY
+      );
+      response.status(200).send({ msg: "Login Successful", token });
+      return;
+    } else {
+      response.status(400).send({ msg: "Invalid credentials" });
+      return;
+    }
+  } catch (err) {
+    console.log(err.message);
   }
 }
 

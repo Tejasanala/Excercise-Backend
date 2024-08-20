@@ -1,3 +1,4 @@
+import { Excercises } from "../entity/excercise.entity.js";
 import {
   UpdateexeById,
   createexeById,
@@ -9,8 +10,26 @@ import { v4 as uuidv4 } from "uuid";
 
 async function GetexeCtr(request, response) {
   //we can also write html codes in send .. it can render the file
-  const allMovies = await Getexe();
-  response.send(allMovies.data);
+  const { search } = request.query;
+
+  if (!search) {
+    const allMovies = await Getexe();
+    response.send(allMovies.data);
+    return;
+  }
+
+  const filterData = await Excercises.scan
+    .where(
+      ({ name, type }, { contains }) => `
+      ${contains(name, search)} OR ${contains(type, search)}
+      `
+    )
+    .go();
+
+  console.log(filterData);
+
+  //   const allMovies = await Getexe();
+  response.send(filterData.data);
 }
 
 async function GetexeByIdCtr(request, response) {
@@ -20,7 +39,7 @@ async function GetexeByIdCtr(request, response) {
 
   // const res = movies.find((findd) => findd.id == id);
   const data = await GetexeById(id);
-  response.send(data);
+  response.send(data.data);
   // if (res) {
   //   response.send(res);
   // } else {
