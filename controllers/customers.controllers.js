@@ -5,7 +5,6 @@ import {
 } from "../service/customers.service.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { Session } from "../entity/session.entity.js";
 
 const genHashpassword = async (password) => {
   const NO_OF_ROUNDS = 10;
@@ -71,14 +70,14 @@ async function getUserCtr(request, response) {
         process.env.SECRET_KEY
       );
 
-      const sessionData = { username, token };
       const roleId = storedDBUser.data.roleId;
-      const userName = storedDBUser.data.username;
+      const username = storedDBUser.data.username;
+      const sessionData = { username, token };
       await createSession(sessionData);
 
       response
         .status(200)
-        .send({ msg: "Login Successful", token, roleId, userName });
+        .send({ msg: "Login Successful", token, roleId, username });
       return;
     } else {
       response.status(400).send({ msg: "Invalid credentials" });
