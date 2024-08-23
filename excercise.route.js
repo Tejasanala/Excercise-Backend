@@ -11,13 +11,13 @@ import { auth } from "./middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.route("/").get(GetexeCtr).post(createexeByIdCtr);
+router.route("/").get(GetexeCtr).post(auth, createexeByIdCtr);
 
 router
   .route("/:id")
   .get(GetexeByIdCtr)
-  .delete(DeleteexeByIdCtr)
-  .put(UpdateexeByIdCtr);
+  .delete(auth, DeleteexeByIdCtr)
+  .put(auth, UpdateexeByIdCtr);
 
 //Both User and admin can perform
 // router.get("/", GetexeCtr);
