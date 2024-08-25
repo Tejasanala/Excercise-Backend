@@ -16,7 +16,7 @@ const genHashpassword = async (password) => {
 async function createUserCtr(request, response) {
   const data = request.body;
   const password = data.password;
-  const roleId = 0;
+  const roleId = 1;
   if (data.password.length < 8) {
     response.status(400).send({ msg: "Password is too short" });
     return;
